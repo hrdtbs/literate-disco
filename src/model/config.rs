@@ -2,6 +2,22 @@ use serde::{Deserialize, Serialize};
 use serde_json::Result;
 use std::collections::HashMap;
 
+pub struct ConfigOption {
+    pub dependencies: HashMap<String, Service>,
+    pub environment_identifier: String,
+    pub output: String,
+}
+
+impl Default for ConfigOption {
+    fn default() -> Self {
+        Self {
+            dependencies: HashMap::new(),
+            environment_identifier: "process.env.NODE_ENV".to_string(),
+            output: "./endpoints/".to_string(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct Service {
     version: String,
@@ -17,24 +33,11 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(
-        dependencies: Option<HashMap<String, Service>>,
-        environment_identifier: Option<String>,
-        output: Option<String>,
-    ) -> Config {
+    pub fn new(option: ConfigOption) -> Config {
         Config {
-            dependencies: match dependencies {
-                Some(dependencies) => dependencies,
-                None => HashMap::new(),
-            },
-            environment_identifier: match environment_identifier {
-                Some(environment_identifier) => environment_identifier,
-                None => "process.env.NODE_ENV".to_string(),
-            },
-            output: match output {
-                Some(output) => output,
-                None => "./endpoints/".to_string(),
-            },
+            dependencies: option.dependencies,
+            environment_identifier: option.environment_identifier,
+            output: option.output,
         }
     }
     pub fn push(&mut self, name: String, version: String, repository: String, workspace: String) {
@@ -55,7 +58,9 @@ impl Config {
 
 #[test]
 fn test_config_new() {
-    let config = Config::new(None, None, None);
+    let config = Config::new(ConfigOption {
+        ..Default::default()
+    });
     let json = config.publish();
 
     let expected = serde_json::to_string_pretty(&Config {
@@ -80,11 +85,11 @@ fn test_config_push() {
         },
     );
 
-    let mut config = Config::new(
-        Some(deps),
-        Some("process.env.NEXT_ENV".to_string()),
-        Some("./src/endpoints/".to_string()),
-    );
+    let mut config = Config::new(ConfigOption {
+        dependencies: deps,
+        environment_identifier: "process.env.NEXT_ENV".to_string(),
+        output: "./src/endpoints/".to_string(),
+    });
 
     config.push(
         "mes".to_string(),
