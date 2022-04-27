@@ -40,15 +40,8 @@ impl Config {
             output: option.output,
         }
     }
-    pub fn push(&mut self, name: String, version: String, repository: String, workspace: String) {
-        self.dependencies.insert(
-            name,
-            Service {
-                version,
-                repository,
-                workspaces: vec![workspace],
-            },
-        );
+    pub fn push(&mut self, name: String, service: Service) {
+        self.dependencies.insert(name, service);
     }
 
     pub fn publish(&self) -> Result<String> {
@@ -93,9 +86,11 @@ fn test_config_push() {
 
     config.push(
         "mes".to_string(),
-        "2.0.0".to_string(),
-        "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
-        "go".to_string(),
+        Service {
+            version: "2.0.0".to_string(),
+            repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
+            workspaces: vec!["go".to_string()],
+        },
     );
 
     let json = config.publish().unwrap();
