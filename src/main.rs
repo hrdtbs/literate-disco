@@ -15,9 +15,9 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     Init {},
-    Add { serviceName: String },
+    Add {},
     Install {},
-    Update { serviceName: Option<String> },
+    Update {},
 }
 
 fn main() {
@@ -26,8 +26,8 @@ fn main() {
         Commands::Init {} => {
             init();
         }
-        Commands::Add { serviceName } => todo!(),
+        Commands::Add {} => todo!(),
         Commands::Install {} => todo!(),
-        Commands::Update { serviceName } => todo!(),
+        Commands::Update {} => todo!(),
     }
 }
