@@ -1,7 +1,5 @@
-mod init;
+mod commands;
 mod model;
-
-use crate::init::init;
 
 use clap::{Parser, Subcommand};
 
@@ -24,7 +22,7 @@ fn main() {
     let cli = Cli::parse();
     match &cli.command {
         Commands::Init {} => {
-            init();
+            commands::init::run();
         }
         Commands::Add {} => todo!(),
         Commands::Install {} => todo!(),
