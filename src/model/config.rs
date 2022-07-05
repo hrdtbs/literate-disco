@@ -27,13 +27,6 @@ pub struct Service {
     workspaces: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct Config {
-    dependencies: HashMap<String, Service>,
-    environment_identifier: String,
-    output: String,
-}
-
 const CONFIG_FILE_NAME: &str = "endpoints.config.json";
 
 pub fn create_config_file() -> Result<()> {
@@ -56,6 +49,13 @@ pub fn read_config_file() -> Result<Config> {
     Ok(config)
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct Config {
+    dependencies: HashMap<String, Service>,
+    environment_identifier: String,
+    output: String,
+}
+
 impl Config {
     pub fn new(option: ConfigOption) -> Config {
         Config {
@@ -64,6 +64,7 @@ impl Config {
             output: option.output,
         }
     }
+    // workspaceが複数のケースに対応していない
     pub fn push(&mut self, name: String, service: Service) {
         self.dependencies.insert(name, service);
     }
