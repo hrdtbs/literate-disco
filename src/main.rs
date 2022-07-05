@@ -24,7 +24,9 @@ fn main() {
         Commands::Init {} => {
             commands::init::run();
         }
-        Commands::Add {} => todo!(),
+        Commands::Add {} => {
+            commands::add::run();
+        }
         Commands::Install {} => todo!(),
         Commands::Update {} => todo!(),
     }
