@@ -13,7 +13,10 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     Init {},
-    Add {},
+    Add {
+        repository: String,
+        workspace: Option<String>,
+    },
     Install {},
     Update {},
 }
@@ -24,8 +27,11 @@ fn main() {
         Commands::Init {} => {
             commands::init::run();
         }
-        Commands::Add {} => {
-            commands::add::run();
+        Commands::Add {
+            repository,
+            workspace,
+        } => {
+            commands::add::run(repository.clone(), workspace.clone());
         }
         Commands::Install {} => todo!(),
         Commands::Update {} => todo!(),

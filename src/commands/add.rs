@@ -2,15 +2,15 @@ use crate::model::config::*;
 use crate::model::repository::*;
 
 pub fn run(repository_name: String, workspace: Option<String>) {
-    let config = read_config_file().unwrap();
-    let repository = Repository::new(repository_name);
-    repository.clone(workspace);
+    let mut config = read_config_file().unwrap();
+    let mut repository = Repository::new(repository_name);
+    repository.clone(workspace.clone());
 
     config.push(
-        repository.name,
+        repository.name.clone(),
         Service {
-            version: repository.version,
-            repository: repository.path,
+            version: repository.version.clone(),
+            repository: repository.path.clone(),
             workspaces: match workspace {
                 Some(workspace) => vec![workspace],
                 None => vec![],

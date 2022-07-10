@@ -22,9 +22,9 @@ impl Default for ConfigOption {
 
 #[derive(Serialize, Deserialize)]
 pub struct Service {
-    version: String,
-    repository: String,
-    workspaces: Vec<String>,
+    pub version: String,
+    pub repository: String,
+    pub workspaces: Vec<String>,
 }
 
 const CONFIG_FILE_NAME: &str = "endpoints.config.json";
@@ -32,7 +32,7 @@ const CONFIG_FILE_NAME: &str = "endpoints.config.json";
 pub fn write_config_file(config: Config) -> Result<()> {
     let mut file = File::open(CONFIG_FILE_NAME).expect("Config file not found");
     let c = config.publish().unwrap();
-    file.write(c.as_bytes()).unwrap();
+    file.write_all(c.as_bytes()).unwrap();
     Ok(())
 }
 
