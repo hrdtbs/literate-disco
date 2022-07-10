@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, process::Command};
 
 struct Env {
     local: String,
@@ -45,9 +45,20 @@ impl Repository {
     }
     // versionの指定機能は使われていない気がするので後回し
     pub fn clone(&mut self, workspace: Option<String>) {
-        todo!("clone repository");
+        Command::new("sh")
+            .arg("-c")
+            .arg(format!(
+                "git clone --no-checkout --quiet {} {}",
+                self.path, self.cache
+            ))
+            .spawn()
+            .unwrap();
     }
     pub fn clean(&mut self) {
-        todo!("clean repository");
+        Command::new("sh")
+            .arg("-c")
+            .arg(format!("rm -rf {}", self.cache))
+            .spawn()
+            .unwrap();
     }
 }
