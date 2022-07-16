@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
 use std::io::prelude::*;
-use std::path::Path;
 use std::{collections::HashMap, process::Command};
 use uuid::Uuid;
 
@@ -12,7 +11,7 @@ struct Env {
     prod: String,
 }
 #[derive(Serialize, Deserialize)]
-struct Endpoint {
+pub struct Endpoint {
     path: String,
     desc: String,
     method: Option<String>,
@@ -20,12 +19,12 @@ struct Endpoint {
 
 type EndpointName = String;
 
-type Api = HashMap<EndpointName, Endpoint>;
+pub type Api = HashMap<EndpointName, Endpoint>;
 
 #[derive(Serialize, Deserialize)]
 pub struct Period {
     env: Env,
-    api: Api,
+    pub api: Api,
 }
 
 type Version = String;
