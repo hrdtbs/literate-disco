@@ -18,6 +18,4 @@ pub fn run(repository_name: String, workspace: Option<String>) {
         },
     );
     write_config_file(config).unwrap();
-
-    repository.clean();
 }
