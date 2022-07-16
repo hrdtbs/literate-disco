@@ -1,4 +1,5 @@
 use std::{collections::HashMap, process::Command};
+use uuid::Uuid;
 
 struct Env {
     local: String,
@@ -38,7 +39,7 @@ impl Repository {
         Repository {
             name: repository_name.split('/').last().unwrap().to_string(),
             path: format!("git@github.com:{}.git", repository_name),
-            cache: format!("./node_modules/.endpoints-tmp/{}", repository_name),
+            cache: format!("./node_modules/.endpoints-tmp/{}", Uuid::new_v4()),
             version: "latest".to_string(),
             data: HashMap::new(),
         }
