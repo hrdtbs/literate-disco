@@ -30,8 +30,9 @@ pub struct Service {
 const CONFIG_FILE_NAME: &str = "endpoints.config.json";
 
 pub fn write_config_file(config: Config) -> Result<()> {
-    let mut file = File::open(CONFIG_FILE_NAME).expect("Config file not found");
+    let mut file = File::create(CONFIG_FILE_NAME).expect("Config file not found");
     let c = config.publish().unwrap();
+
     file.write_all(c.as_bytes()).unwrap();
     Ok(())
 }
