@@ -6,15 +6,15 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
 struct Env {
-    local: String,
-    dev: String,
-    prod: String,
+    pub local: String,
+    pub dev: String,
+    pub prod: String,
 }
 #[derive(Serialize, Deserialize)]
 pub struct Endpoint {
-    path: String,
-    desc: String,
-    method: Option<String>,
+    pub path: String,
+    pub desc: String,
+    pub method: Option<String>,
 }
 
 type EndpointName = String;
