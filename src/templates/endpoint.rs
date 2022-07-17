@@ -2,19 +2,11 @@ use crate::model::repository::Endpoint;
 use std::collections::HashSet;
 
 // @see https://github.com/matsuri-tech/endpoints-sdk-cli/blob/dc3de607086657a0b7f33a53120804989d1c5a2a/src/templates/functions/endpoint.ts#L70
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct Param {
     name: String,
     example: Option<String>,
     param_type: String,
-}
-
-fn pick_param_names(params: Vec<Param>) -> Vec<String> {
-    let mut names = vec![];
-    for param in params {
-        names.push(param.name.clone());
-    }
-    names
 }
 
 fn detect_param_type(example: &str) -> String {
@@ -101,16 +93,31 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) {
     };
     let path_params = make_path_params(endpoint_path);
 
-    let query_param_names = pick_param_names(query_params);
-    let path_param_names = pick_param_names(path_params);
-    let param_names = query_param_names
-        .clone()
-        .into_iter()
-        .chain(path_param_names.clone().into_iter())
-        .collect::<HashSet<_>>();
+    let mut param_names: Vec<String> = Vec::new();
+    let mut query_param_names: Vec<String> = Vec::new();
+    let mut params: Vec<Param> = Vec::new();
+    for param in query_params {
+        if param_names.contains(&param.name) {
+            continue;
+        }
+        param_names.push(param.name.clone());
+        query_param_names.push(param.name.clone());
+        params.push(param);
+    }
+
+    let mut path_param_names: Vec<String> = Vec::new();
+    for param in path_params {
+        if param_names.contains(&param.name) {
+            continue;
+        }
+        param_names.push(param.name.clone());
+        path_param_names.push(param.name.clone());
+        params.push(param);
+    }
     println!("{:?}", query_param_names);
     println!("{:?}", path_param_names);
     println!("{:?}", param_names);
+    println!("{:?}", params);
 }
 
 #[test]
@@ -118,7 +125,7 @@ fn test_make_endpoint() {
     make_endpoint(
         "".to_string(),
         Endpoint {
-            path: "/:id/?ee&hoge=22&id=hoge".to_string(),
+            path: "/:id/:date/?ee&hoge=22&id=hoge".to_string(),
             desc: "".to_string(),
             method: None,
         },
