@@ -56,6 +56,29 @@ fn test_make_query_params() {
     assert_eq!(params[2].param_type, "string");
 }
 
+fn make_path_params(path: String) -> Vec<Param> {
+    path.split('/')
+        .filter(|s| s.starts_with(':'))
+        .map(|s| -> Param {
+            Param {
+                name: s[1..].to_string(),
+                example: None,
+                param_type: "string".to_string(),
+            }
+        })
+        .collect::<Vec<Param>>()
+}
+#[test]
+fn test_make_path_params() {
+    let params = make_path_params("/api/v1/users/:id/items/:itemId".to_string());
+    assert_eq!(params[0].name, "id");
+    assert_eq!(params[0].example, None);
+    assert_eq!(params[0].param_type, "string");
+    assert_eq!(params[1].name, "itemId");
+    assert_eq!(params[1].example, None);
+    assert_eq!(params[1].param_type, "string");
+}
+
 pub fn make_endpoint(name: String, e: Endpoint) {
     let pv = e.path.split('?').collect::<Vec<_>>();
     println!("{}", pv[0]);
