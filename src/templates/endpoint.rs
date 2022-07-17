@@ -1,10 +1,20 @@
 use crate::model::repository::Endpoint;
+use std::collections::HashSet;
 
 // @see https://github.com/matsuri-tech/endpoints-sdk-cli/blob/dc3de607086657a0b7f33a53120804989d1c5a2a/src/templates/functions/endpoint.ts#L70
+#[derive(PartialEq, Eq, Hash)]
 struct Param {
     name: String,
     example: Option<String>,
     param_type: String,
+}
+
+fn pick_param_names(params: Vec<Param>) -> Vec<String> {
+    let mut names = vec![];
+    for param in params {
+        names.push(param.name.clone());
+    }
+    names
 }
 
 fn detect_param_type(example: &str) -> String {
@@ -79,11 +89,28 @@ fn test_make_path_params() {
     assert_eq!(params[1].param_type, "string");
 }
 
-pub fn make_endpoint(name: String, e: Endpoint) {
-    let pv = e.path.split('?').collect::<Vec<_>>();
-    println!("{}", pv[0]);
-    let qp = make_query_params(pv[1].to_string());
-    println!("{}", qp[0].name);
+pub fn make_endpoint(name: String, endpoint: Endpoint) {
+    let pv = endpoint.path.split('?').collect::<Vec<_>>();
+    let endpoint_path = pv[0].to_string();
+    let query_params = {
+        if pv.len() > 1 {
+            make_query_params(pv[1].to_string())
+        } else {
+            vec![]
+        }
+    };
+    let path_params = make_path_params(endpoint_path);
+
+    let query_param_names = pick_param_names(query_params);
+    let path_param_names = pick_param_names(path_params);
+    let param_names = query_param_names
+        .clone()
+        .into_iter()
+        .chain(path_param_names.clone().into_iter())
+        .collect::<HashSet<_>>();
+    println!("{:?}", query_param_names);
+    println!("{:?}", path_param_names);
+    println!("{:?}", param_names);
 }
 
 #[test]
@@ -91,7 +118,7 @@ fn test_make_endpoint() {
     make_endpoint(
         "".to_string(),
         Endpoint {
-            path: "/?ee".to_string(),
+            path: "/:id/?ee&hoge=22&id=hoge".to_string(),
             desc: "".to_string(),
             method: None,
         },
