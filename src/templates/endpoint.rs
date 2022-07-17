@@ -1,5 +1,5 @@
 use crate::model::repository::Endpoint;
-use std::collections::HashSet;
+use std::{collections::HashSet, fmt::format};
 
 // @see https://github.com/matsuri-tech/endpoints-sdk-cli/blob/dc3de607086657a0b7f33a53120804989d1c5a2a/src/templates/functions/endpoint.ts#L70
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -81,7 +81,7 @@ fn test_make_path_params() {
     assert_eq!(params[1].param_type, "string");
 }
 
-pub fn make_endpoint(name: String, endpoint: Endpoint) {
+pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
     let pv = endpoint.path.split('?').collect::<Vec<_>>();
     let endpoint_path = pv[0].to_string();
     let query_params = {
@@ -114,15 +114,33 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) {
         path_param_names.push(param.name.clone());
         params.push(param);
     }
-    println!("{:?}", query_param_names);
-    println!("{:?}", path_param_names);
-    println!("{:?}", param_names);
-    println!("{:?}", params);
+    let description = endpoint.desc;
+    let path_template = "".to_string();
+    let result = format!(
+        r#"
+/**
+ * {description}
+ */
+export const {name}=()=>{{
+    const __root = root();
+    const __queries = Object.entries()
+        .filter(([_, value])=> {{
+        return value !== undefined
+        }})
+        .map(([key, value])=> {{
+        return \`\${{key}}=\${{value}}\`
+        }}).join("&");
+    const __path = \`\${{__root}}/\${{\`${path_template}\`}}\`;
+    return __queries ? \`\${{__path}}?\${{__queries}}\` : __path;
+}}; 
+    "#
+    );
+    result
 }
 
 #[test]
 fn test_make_endpoint() {
-    make_endpoint(
+    let result = make_endpoint(
         "".to_string(),
         Endpoint {
             path: "/:id/:date/?ee&hoge=22&id=hoge".to_string(),
@@ -130,4 +148,5 @@ fn test_make_endpoint() {
             method: None,
         },
     );
+    println!("{}", result);
 }
