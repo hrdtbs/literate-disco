@@ -91,12 +91,12 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
             vec![]
         }
     };
-    let path_params = make_path_params(endpoint_path);
+    let path_params = make_path_params(endpoint_path.clone());
 
     let mut param_names: Vec<String> = Vec::new();
     let mut query_param_names: Vec<String> = Vec::new();
     let mut params: Vec<Param> = Vec::new();
-    for param in query_params {
+    for param in query_params.clone() {
         if param_names.contains(&param.name) {
             continue;
         }
@@ -106,7 +106,7 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
     }
 
     let mut path_param_names: Vec<String> = Vec::new();
-    for param in path_params {
+    for param in path_params.clone() {
         if param_names.contains(&param.name) {
             continue;
         }
@@ -115,6 +115,22 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
         params.push(param);
     }
     let description = endpoint.desc;
+    let query_params_comment = if query_params.len() > 0 {
+        query_params
+            .iter()
+            .map(|param| {
+                format!(
+                    "@param {{{}}} {} {}",
+                    param.param_type,
+                    param.name,
+                    param.example.clone().unwrap_or("".to_string())
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n * ")
+    } else {
+        "".to_string()
+    };
     let parameters = param_names.join(", ");
     let parameter_types = params
         .iter()
@@ -132,25 +148,34 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
         })
         .collect::<Vec<_>>()
         .join(", ");
-    let path_template = "hello".to_string();
+    let query_param_names_str = query_param_names.join(", ");
+    let path_template = {
+        let mut path_template = endpoint_path;
+        for param in path_params {
+            path_template =
+                path_template.replace(&format!(":{}", param.name), &format!("${{{}}}", param.name));
+        }
+        path_template
+    };
     let result = format!(
         r#"
 /**
  * {description}
+ * {query_params_comment}
  */
 export const {name}=({{{parameters}}}:{{{parameter_types}}})=>{{
     const __root = root();
-    const __queries = Object.entries()
+    const __queries = Object.entries({{{query_param_names_str}}})
         .filter(([_, value])=> {{
             return value !== undefined
         }})
         .map(([key, value])=> {{
             return `${{key}}=${{value}}`
         }}).join("&");
-    const __path = `${{__root}}/${{{path_template}}}`;
+    const __path = `${{__root}}{path_template}`;
     return __queries ? `${{__path}}?${{__queries}}` : __path;
-}}; 
-    "#
+}};
+"#
     );
     result
 }
@@ -161,9 +186,32 @@ fn test_make_endpoint() {
         "health_check".to_string(),
         Endpoint {
             path: "/:id/:date/?ee&hoge=22&id=hoge".to_string(),
-            desc: "".to_string(),
+            desc: "This is health check".to_string(),
             method: None,
         },
     );
     println!("{}", result);
+    assert_eq!(
+        result,
+        r#"
+/**
+ * This is health check
+ * @param {string} ee 
+ * @param {number} hoge 22
+ * @param {string} id hoge
+ */
+export const health_check=({ee, hoge, id, date}:{ee?: string, hoge?: number, id?: string, date: string})=>{
+    const __root = root();
+    const __queries = Object.entries({ee, hoge, id})
+        .filter(([_, value])=> {
+            return value !== undefined
+        })
+        .map(([key, value])=> {
+            return `${key}=${value}`
+        }).join("&");
+    const __path = `${__root}/${id}/${date}/`;
+    return __queries ? `${__path}?${__queries}` : __path;
+};
+"#
+    );
 }
