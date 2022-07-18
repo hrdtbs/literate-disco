@@ -115,7 +115,7 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
         params.push(param);
     }
     let description = endpoint.desc;
-    let path_template = "".to_string();
+    let path_template = "hello".to_string();
     let result = format!(
         r#"
 /**
@@ -125,13 +125,13 @@ export const {name}=()=>{{
     const __root = root();
     const __queries = Object.entries()
         .filter(([_, value])=> {{
-        return value !== undefined
+            return value !== undefined
         }})
         .map(([key, value])=> {{
-        return \`\${{key}}=\${{value}}\`
+            return `${{key}}=${{value}}`
         }}).join("&");
-    const __path = \`\${{__root}}/\${{\`${path_template}\`}}\`;
-    return __queries ? \`\${{__path}}?\${{__queries}}\` : __path;
+    const __path = `${{__root}}/${{`${path_template}`}}\`;
+    return __queries ? `${{__path}}?${{__queries}}` : __path;
 }}; 
     "#
     );
@@ -141,7 +141,7 @@ export const {name}=()=>{{
 #[test]
 fn test_make_endpoint() {
     let result = make_endpoint(
-        "".to_string(),
+        "health_check".to_string(),
         Endpoint {
             path: "/:id/:date/?ee&hoge=22&id=hoge".to_string(),
             desc: "".to_string(),
