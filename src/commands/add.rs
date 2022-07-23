@@ -1,5 +1,6 @@
 use crate::model::config::*;
 use crate::model::repository::*;
+use crate::templates::endpoint::make_endpoint;
 use convert_case::{Case, Casing};
 
 pub fn run(repository_name: String, workspace: Option<String>) {
@@ -7,10 +8,11 @@ pub fn run(repository_name: String, workspace: Option<String>) {
     let mut repository = Repository::new(repository_name);
     repository.clone(workspace.clone());
 
-    for (version, period) in &repository.data {
-        for (_name, endpoint) in &period.api {
+    for (version, period) in repository.data {
+        for (_name, _endpoint) in period.api {
             let name = _name.clone().to_case(Case::Camel);
-            println!("{}", name);
+            let endpoint_function = make_endpoint(name.clone(), _endpoint);
+            println!("{}", endpoint_function);
         }
     }
 
