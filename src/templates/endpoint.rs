@@ -1,6 +1,4 @@
 use crate::model::repository::Endpoint;
-use std::{collections::HashSet, fmt::format};
-
 // @see https://github.com/matsuri-tech/endpoints-sdk-cli/blob/dc3de&607086657a0b7f33a53120804989d1c5a2a/src/templates/functions/endpoint.ts#L70
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct Param {

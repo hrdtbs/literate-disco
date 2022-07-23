@@ -1,7 +1,7 @@
 use crate::model::config::*;
 use crate::model::repository::*;
 use crate::templates::endpoint::make_endpoint;
-use convert_case::{Case, Casing};
+use crate::utils::to_camel_case::to_camel_case;
 
 pub fn run(repository_name: String, workspace: Option<String>) {
     let mut config = read_config_file().unwrap();
@@ -9,11 +9,21 @@ pub fn run(repository_name: String, workspace: Option<String>) {
     repository.clone(workspace.clone());
 
     for (version, period) in repository.data {
+        let mut names: Vec<String> = Vec::new();
+        let mut fns: Vec<String> = Vec::new();
+
         for (_name, _endpoint) in period.api {
-            let name = _name.clone().to_case(Case::Camel);
-            let endpoint_function = make_endpoint(name.clone(), _endpoint);
-            println!("{}", endpoint_function);
+            let name = to_camel_case(&_name.to_string());
+            names.push(name.clone());
+            fns.push(make_endpoint(name.clone(), _endpoint));
         }
+        let exports = format!(
+            "export const {}_{} = {{{}}};",
+            to_camel_case(&repository.name.clone()),
+            to_camel_case(&version.clone()),
+            names.join(",")
+        );
+        println!("{}", exports);
     }
 
     config.push(
