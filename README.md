@@ -4,18 +4,10 @@
 
 generate endpoints.config.json
 
-## cmd add service
+## cmd add repository_name
 
 add service to endpoints.config.json & install service
-
-## cmd install?
-
-install services
 
 ## cmd update <service>
 
 update service
-
-## cmd update
-
-update services
