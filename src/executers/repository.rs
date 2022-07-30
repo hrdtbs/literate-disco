@@ -3,22 +3,28 @@ use anyhow::{Ok, Result};
 use std::fs::{self, File};
 use std::io::Read;
 use std::process::Command;
+use uuid::Uuid;
 
-pub fn clone_repository(repository: &Repository) -> Result<String> {
+pub fn get_repository_alias(repository_name: &str) -> Result<String> {
+    let alias = repository_name.split('/').last().unwrap();
+    Ok(alias.to_string())
+}
+
+pub fn get_repository_ssh_path(repository_name: &String) -> Result<String> {
+    Ok(format!("git@github.com:{}.git", repository_name))
+}
+
+pub fn clone_repository(ssh_path: &String) -> Result<String> {
+    let cache = format!("node_modules/.endpoints-tmp/{}", Uuid::new_v4());
+
     Command::new("git")
-        .args(&[
-            "clone",
-            "--no-checkout",
-            "--quiet",
-            &repository.path,
-            &repository.cache,
-        ])
+        .args(&["clone", "--no-checkout", "--quiet", ssh_path, &cache])
         .spawn()
         .unwrap()
         .wait()?;
 
     let repository_path = {
-        let path_buf = fs::canonicalize(&repository.cache)?;
+        let path_buf = fs::canonicalize(&cache)?;
         path_buf.display().to_string()
     };
 

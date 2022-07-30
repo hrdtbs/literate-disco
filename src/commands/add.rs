@@ -1,16 +1,16 @@
 use crate::executers::config::*;
 use crate::executers::repository::*;
 use crate::model::config::*;
-use crate::model::repository::*;
 use crate::templates::endpoint::make_endpoint;
 use crate::utils::to_camel_case::to_camel_case;
 use anyhow::{Ok, Result};
 
 pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
     let mut config = read_config_file()?;
-    let repository = Repository::new(repository_name);
 
-    let repository_path = clone_repository(&repository)?;
+    let repository_alias = get_repository_alias(&repository_name)?;
+    let ssh_path = get_repository_ssh_path(&repository_name)?;
+    let repository_path = clone_repository(&ssh_path)?;
     let head_commit_hash = get_head_commit_hash(&repository_path)?;
     let main_branch_name = detect_main_branch(&repository_path)?;
 
@@ -27,7 +27,7 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
         }
         let exports = format!(
             "export const {}_{} = {{{}}};",
-            to_camel_case(&repository.name.clone()),
+            to_camel_case(&repository_alias),
             to_camel_case(&version.clone()),
             names.join(",")
         );
@@ -35,10 +35,10 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
     }
 
     config.push(
-        repository.name.clone(),
+        repository_alias,
         Service {
             version: head_commit_hash,
-            repository: repository.path,
+            repository: ssh_path,
             workspaces: match workspace {
                 Some(workspace) => vec![workspace],
                 None => vec![],
