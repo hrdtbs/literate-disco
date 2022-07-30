@@ -1,7 +1,7 @@
 use crate::model::config::*;
 use anyhow::Result;
+use std::fs::File;
 use std::io::prelude::*;
-use std::{fs::File, io::Write};
 
 const CONFIG_FILE_NAME: &str = "endpoints.config.json";
 
@@ -16,9 +16,8 @@ pub fn create_config_file() -> Result<()> {
     let mut output: File = File::create(CONFIG_FILE_NAME)?;
     let config = Config::new(ConfigOption {
         ..Default::default()
-    })
-    .publish()?;
-    output.write_all(config.as_bytes())?;
+    });
+    serde_json::to_writer_pretty(&mut output, &config)?;
     Ok(())
 }
 
