@@ -44,10 +44,6 @@ impl Config {
     pub fn push(&mut self, name: String, service: Service) {
         self.dependencies.insert(name, service);
     }
-
-    pub fn publish(&self) -> Result<String> {
-        serde_json::to_string_pretty(self)
-    }
 }
 
 #[test]
@@ -55,7 +51,6 @@ fn test_config_new() {
     let config = Config::new(ConfigOption {
         ..Default::default()
     });
-    let json = config.publish();
 
     let expected = serde_json::to_string_pretty(&Config {
         dependencies: HashMap::new(),
@@ -64,7 +59,7 @@ fn test_config_new() {
     })
     .unwrap();
 
-    assert_eq!(json.unwrap(), expected);
+    assert_eq!(serde_json::to_string_pretty(&config).unwrap(), expected);
 }
 
 #[test]
@@ -94,7 +89,7 @@ fn test_config_push() {
         },
     );
 
-    let json = config.publish().unwrap();
+    let json = serde_json::to_string_pretty(&config).unwrap();
     let result: Config = serde_json::from_str(&json).unwrap();
 
     assert_eq!(
