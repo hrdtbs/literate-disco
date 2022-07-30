@@ -1,3 +1,4 @@
+use crate::executers::config::*;
 use crate::model::config::*;
 use crate::model::repository::*;
 use crate::templates::endpoint::make_endpoint;
@@ -37,5 +38,6 @@ pub fn run(repository_name: String, workspace: Option<String>) {
             },
         },
     );
+
     write_config_file(config).unwrap();
 }

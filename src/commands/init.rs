@@ -1,5 +1,5 @@
-use crate::model::config;
+use crate::executers::config::*;
 
 pub fn run() {
-    config::create_config_file().unwrap();
+    create_config_file().unwrap();
 }

@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
 use std::collections::HashMap;
-use std::io::prelude::*;
-use std::{fs::File, io::Write};
 
 pub struct ConfigOption {
     pub dependencies: HashMap<String, Service>,
@@ -25,36 +23,6 @@ pub struct Service {
     pub version: String,
     pub repository: String,
     pub workspaces: Vec<String>,
-}
-
-const CONFIG_FILE_NAME: &str = "endpoints.config.json";
-
-pub fn write_config_file(config: Config) -> Result<()> {
-    let mut file = File::create(CONFIG_FILE_NAME).expect("Config file not found");
-    let c = config.publish().unwrap();
-
-    file.write_all(c.as_bytes()).unwrap();
-    Ok(())
-}
-
-pub fn create_config_file() -> Result<()> {
-    let mut output: File = File::create(CONFIG_FILE_NAME).unwrap();
-    let config = Config::new(ConfigOption {
-        ..Default::default()
-    })
-    .publish()
-    .unwrap();
-    output.write_all(config.as_bytes()).unwrap();
-    Ok(())
-}
-
-pub fn read_config_file() -> Result<Config> {
-    let mut file = File::open(CONFIG_FILE_NAME).expect("Config file not found");
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .expect("Couldn't read config file");
-    let config: Config = serde_json::from_str(&contents)?;
-    Ok(config)
 }
 
 #[derive(Serialize, Deserialize)]
