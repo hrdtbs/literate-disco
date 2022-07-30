@@ -1,15 +1,22 @@
 use crate::executers::config::*;
+use crate::executers::repository::*;
 use crate::model::config::*;
 use crate::model::repository::*;
 use crate::templates::endpoint::make_endpoint;
 use crate::utils::to_camel_case::to_camel_case;
+use anyhow::{Ok, Result};
 
-pub fn run(repository_name: String, workspace: Option<String>) {
-    let mut config = read_config_file().unwrap();
-    let mut repository = Repository::new(repository_name);
-    repository.clone(workspace.clone());
+pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
+    let mut config = read_config_file()?;
+    let repository = Repository::new(repository_name);
 
-    for (version, period) in repository.data {
+    let repository_path = clone_repository(&repository)?;
+    let head_commit_hash = get_head_commit_hash(&repository_path)?;
+    let main_branch_name = detect_main_branch(&repository_path)?;
+
+    let repository_data = get_repository_data(&repository_path, &main_branch_name, &workspace)?;
+
+    for (version, period) in repository_data {
         let mut names: Vec<String> = Vec::new();
         let mut fns: Vec<String> = Vec::new();
 
@@ -30,8 +37,8 @@ pub fn run(repository_name: String, workspace: Option<String>) {
     config.push(
         repository.name.clone(),
         Service {
-            version: repository.version.clone(),
-            repository: repository.path.clone(),
+            version: head_commit_hash,
+            repository: repository.path,
             workspaces: match workspace {
                 Some(workspace) => vec![workspace],
                 None => vec![],
@@ -39,5 +46,6 @@ pub fn run(repository_name: String, workspace: Option<String>) {
         },
     );
 
-    write_config_file(config).unwrap();
+    write_config_file(config)?;
+    Ok(())
 }

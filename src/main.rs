@@ -4,6 +4,7 @@ mod model;
 mod templates;
 mod utils;
 
+use anyhow::{Ok, Result};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -24,7 +25,7 @@ enum Commands {
     Update {},
 }
 
-fn main() {
+fn main() -> Result<()> {
     let cli = Cli::parse();
     match &cli.command {
         Commands::Init {} => {
@@ -34,9 +35,10 @@ fn main() {
             repository,
             workspace,
         } => {
-            commands::add::run(repository.clone(), workspace.clone());
+            commands::add::run(repository.clone(), workspace.clone())?;
         }
         Commands::Install {} => todo!(),
         Commands::Update {} => todo!(),
     }
+    Ok(())
 }

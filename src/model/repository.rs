@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::fs::{self, File};
-use std::io::prelude::*;
-use std::{collections::HashMap, process::Command};
+use std::collections::HashMap;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
@@ -48,57 +46,5 @@ impl Repository {
             version: "latest".to_string(),
             data: HashMap::new(),
         }
-    }
-    // versionの指定機能は使われていない気がするので後回し
-    pub fn clone(&mut self, workspace: Option<String>) {
-        Command::new("git")
-            .args(&["clone", "--no-checkout", "--quiet", &self.path, &self.cache])
-            .spawn()
-            .unwrap()
-            .wait()
-            .expect("git clone failed");
-
-        let cache_path = fs::canonicalize(&self.cache).unwrap().display().to_string();
-
-        self.version = {
-            let output = Command::new("git")
-                .args(&["rev-parse", "HEAD"])
-                .current_dir(&cache_path)
-                .output()
-                .expect("failed to rev-parse");
-            String::from_utf8(output.stdout).unwrap().trim().to_string()
-        };
-
-        let main_branch = {
-            let output = Command::new("git")
-                .args(&["rev-parse", "--abbrev-ref", "origin/HEAD"])
-                .current_dir(&cache_path)
-                .output()
-                .expect("failed to rev-parse");
-            let vec = output.stdout;
-            String::from_utf8(vec).unwrap().trim().to_string()
-        };
-
-        let target_file = {
-            match workspace {
-                Some(w) => format!("{}/{}/.endpoints.json", cache_path, w),
-                None => format!("{}/.endpoints.json", cache_path),
-            }
-        };
-        Command::new("git")
-            .args(&["checkout", &main_branch, "--", &target_file])
-            .current_dir(&cache_path)
-            .output()
-            .expect("git checkout command failed");
-
-        let mut contents = String::new();
-        File::open(target_file)
-            .expect("endpoints.json not found")
-            .read_to_string(&mut contents)
-            .expect("failed to read endpoints.json");
-
-        let data: Data = serde_json::from_str(&contents).unwrap();
-
-        self.data = data;
     }
 }
