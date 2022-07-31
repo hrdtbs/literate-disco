@@ -28,7 +28,7 @@ pub struct Service {
 pub struct Config {
     dependencies: HashMap<String, Service>,
     environment_identifier: String,
-    output: String,
+    pub output: String,
 }
 
 impl Config {

@@ -1,4 +1,5 @@
 use crate::executers::config::*;
+use crate::executers::endpoint::*;
 use crate::executers::repository::*;
 use crate::model::config::*;
 use crate::templates::endpoint::make_endpoint;
@@ -31,7 +32,15 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
             to_camel_case(&version.clone()),
             names.join(",")
         );
-        println!("{}", exports);
+
+        let filepath = get_endpoint_filepath(
+            config.output.clone(),
+            repository_alias.clone(),
+            workspace.clone(),
+            version.clone(),
+        )?;
+
+        write_endpoint_file(filepath, [fns.join("\n"), exports].join("\n"))?;
     }
 
     config.push(

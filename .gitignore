@@ -11,3 +11,4 @@ Cargo.lock
 
 endpoints.config.json
 node_modules/
+endpoints/
