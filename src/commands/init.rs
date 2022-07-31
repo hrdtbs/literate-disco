@@ -1,5 +1,7 @@
 use crate::executers::config::*;
+use anyhow::{Ok, Result};
 
-pub fn run() {
-    create_config_file().unwrap();
+pub fn run() -> Result<()> {
+    create_config_file()?;
+    Ok(())
 }
