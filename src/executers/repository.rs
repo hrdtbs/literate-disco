@@ -1,4 +1,4 @@
-use crate::model::repository::*;
+use crate::model::endpoint::*;
 use anyhow::{Ok, Result};
 use std::fs::{self, File};
 use std::io::Read;
@@ -53,7 +53,7 @@ pub fn get_repository_data(
     repository_path: &String,
     branch_name: &String,
     workspace: &Option<String>,
-) -> Result<Data> {
+) -> Result<EndpointSetting> {
     let target_file = {
         match workspace {
             Some(w) => format!("{}/{}/.endpoints.json", repository_path, w),
@@ -69,6 +69,6 @@ pub fn get_repository_data(
     let mut file = File::open(target_file)?;
     file.read_to_string(&mut contents)?;
 
-    let data: Data = serde_json::from_str(&contents).unwrap();
-    Ok(data)
+    let setting: EndpointSetting = serde_json::from_str(&contents).unwrap();
+    Ok(setting)
 }
