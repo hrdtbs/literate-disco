@@ -1,7 +1,7 @@
 pub fn to_camel_case(name: &str) -> String {
     let mut result = String::new();
     let mut first = false;
-    for c in name.to_lowercase().chars() {
+    for c in name.chars() {
         if first {
             result.push(c.to_ascii_uppercase());
             first = false;
