@@ -29,7 +29,7 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
     match &cli.command {
         Commands::Init {} => {
-            commands::init::run();
+            commands::init::run()?;
         }
         Commands::Add {
             repository,

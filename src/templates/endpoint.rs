@@ -1,5 +1,5 @@
 use crate::model::endpoint::Endpoint;
-// @see https://github.com/matsuri-tech/endpoints-sdk-cli/blob/dc3de&607086657a0b7f33a53120804989d1c5a2a/src/templates/functions/endpoint.ts#L70
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct Param {
     name: String,
@@ -113,7 +113,7 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
         params.push(param);
     }
     let description = endpoint.desc;
-    let query_params_comment = if query_params.len() > 0 {
+    let query_params_comment = if query_params.is_empty() {
         query_params
             .iter()
             .map(|param| {
@@ -121,7 +121,7 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
                     "@param {{{}}} {} {}",
                     param.param_type,
                     param.name,
-                    param.example.clone().unwrap_or("".to_string())
+                    param.example.clone().unwrap_or_else(|| "".to_string())
                 )
             })
             .collect::<Vec<_>>()
