@@ -121,7 +121,7 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
                     "@param {{{}}} {} {}",
                     param.param_type,
                     param.name,
-                    param.example.clone().unwrap_or_else(|| "".to_string())
+                    param.example.clone().unwrap_or_default()
                 )
             })
             .collect::<Vec<_>>()

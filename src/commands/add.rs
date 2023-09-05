@@ -11,6 +11,7 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
 
     let repository_alias = get_repository_alias(&repository_name)?;
     let ssh_path = get_repository_ssh_path(&repository_name)?;
+
     let repository_path = clone_repository(&ssh_path)?;
     let head_commit_hash = get_head_commit_hash(&repository_path)?;
     let main_branch_name = detect_main_branch(&repository_path)?;
@@ -33,14 +34,14 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
             names.join(",")
         );
 
-        let filepath = get_endpoint_filepath(
-            config.output.clone(),
-            repository_alias.clone(),
-            workspace.clone(),
-            version.clone(),
-        )?;
+        let filepath =
+            get_endpoint_filepath(repository_alias.clone(), workspace.clone(), version.clone())?;
 
-        write_endpoint_file(filepath, [fns.join("\n"), exports].join("\n"))?;
+        write_endpoint_file(
+            config.output.clone(),
+            filepath,
+            [fns.join("\n"), exports].join("\n"),
+        )?;
     }
 
     config.push(
