@@ -113,7 +113,7 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
         params.push(param);
     }
     let description = endpoint.desc;
-    let query_params_comment = if query_params.is_empty() {
+    let query_params_comment = if !query_params.is_empty() {
         query_params
             .iter()
             .map(|param| {
