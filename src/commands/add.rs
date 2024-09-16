@@ -19,6 +19,9 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
 
     let repository_data = get_repository_data(&repository_path, &main_branch_name, &workspace)?;
 
+    let mut index_imports: Vec<String> = Vec::new();
+    let mut index_exports_names: Vec<String> = Vec::new();
+
     for (version, period) in repository_data {
         if period.env.as_ref().map_or(true, |env| env.is_empty())
             && period.api.as_ref().map_or(true, |api| api.is_empty())
@@ -50,12 +53,34 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
         let filepath =
             get_endpoint_filepath(repository_alias.clone(), workspace.clone(), version.clone())?;
 
+        index_imports.push(format!(
+            "import * as {} from './{}.{}';",
+            to_camel_case(&version.clone()),
+            &repository_alias,
+            version.clone()
+        ));
+        index_exports_names.push(to_camel_case(&version.clone()));
+
         write_endpoint_file(
             config.output.clone(),
             filepath,
             [fns.join("\n"), exports].join("\n"),
         )?;
     }
+
+    write_endpoint_file(
+        config.output.clone(),
+        [repository_alias.clone(), "ts".to_string()].join("."),
+        [
+            index_imports.join("\n"),
+            format!(
+                "export const {} = {{{}}};",
+                to_camel_case(&repository_alias),
+                index_exports_names.join(",")
+            ),
+        ]
+        .join("\n"),
+    )?;
 
     config.push(
         repository_alias,
