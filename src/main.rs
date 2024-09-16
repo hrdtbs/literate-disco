@@ -5,7 +5,7 @@ mod templates;
 mod utils;
 
 use anyhow::{Ok, Result};
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -17,12 +17,22 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     Init {},
-    Add {
-        repository: String,
-        workspace: Option<String>,
-    },
+    Add(AddArgs),
     Install {},
     Update {},
+}
+
+#[derive(Args)]
+struct AddArgs {
+    repository: String,
+    #[clap(short, long)]
+    workspace: Option<String>,
+    #[clap(short, long)]
+    branch: Option<String>,
+    #[clap(short, long)]
+    version: Option<String>,
+    #[clap(short, long)]
+    excludes: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -31,11 +41,8 @@ fn main() -> Result<()> {
         Commands::Init {} => {
             commands::init::run()?;
         }
-        Commands::Add {
-            repository,
-            workspace,
-        } => {
-            commands::add::run(repository.clone(), workspace.clone())?;
+        Commands::Add(args) => {
+            commands::add::run(args.repository.clone(), args.workspace.clone())?;
         }
         Commands::Install {} => todo!(),
         Commands::Update {} => todo!(),

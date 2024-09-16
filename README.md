@@ -1,13 +1,20 @@
 # literate-disco
 
-## cmd init
+- [x] init
+- [x] add [username/repository]
+- [x] add [username/repository] -w [workspace_name]
+- [ ] add [username/repository] -v [commmit_hash]
+- [ ] add [username/repository] -b [branch name]
+- [ ] add [username/repository] -e [period name] [period name]
+- [ ] install
+- [ ] update [service_name]
+- [ ] `environment_identifier`
+- [ ] override root url
 
-generate endpoints.config.json
 
-## cmd add repository_name
+## not supported
 
-add service to endpoints.config.json & install service
-
-## cmd update <service>
-
-update service
+- add /Users/.../local-repository/
+- add ./local-repository
+- add git@github.com:[username/repository].git
+- add https://github.com/[username/repository].git
