@@ -3,6 +3,7 @@ use crate::executers::endpoint::*;
 use crate::executers::repository::*;
 use crate::model::config::*;
 use crate::templates::endpoint::make_endpoint;
+use crate::templates::root::make_root;
 use crate::utils::to_camel_case::to_camel_case;
 use anyhow::{Ok, Result};
 
@@ -21,6 +22,9 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
     for (version, period) in repository_data {
         let mut names: Vec<String> = Vec::new();
         let mut fns: Vec<String> = Vec::new();
+
+        let root = make_root(config.environment_identifier.clone(), period.env);
+        fns.push(root);
 
         for (_name, _endpoint) in period.api {
             let name = to_camel_case(&_name.to_string());

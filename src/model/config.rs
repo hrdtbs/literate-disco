@@ -27,7 +27,7 @@ pub struct Service {
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     dependencies: HashMap<String, Service>,
-    environment_identifier: String,
+    pub environment_identifier: String,
     pub output: String,
 }
 

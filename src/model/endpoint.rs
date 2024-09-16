@@ -1,12 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize)]
-struct EnvList {
-    pub local: String,
-    pub dev: String,
-    pub prod: String,
-}
+pub type EnvList = HashMap<String, String>;
 #[derive(Serialize, Deserialize)]
 pub struct Endpoint {
     pub path: String,
@@ -20,7 +15,7 @@ type EndpointList = HashMap<EndpointName, Endpoint>;
 
 #[derive(Serialize, Deserialize)]
 pub struct EndpointAssets {
-    env: EnvList,
+    pub env: EnvList,
     pub api: EndpointList,
 }
 
