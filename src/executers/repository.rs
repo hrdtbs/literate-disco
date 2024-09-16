@@ -1,6 +1,6 @@
 use crate::model::endpoint::*;
 use anyhow::{Ok, Result};
-use std::fs::{self, File};
+use std::fs::File;
 use std::io::Read;
 use std::process::Command;
 use uuid::Uuid;
@@ -11,7 +11,7 @@ pub fn get_repository_alias(repository_name: &str) -> Result<String> {
 }
 
 pub fn get_repository_ssh_path(repository_name: &String) -> Result<String> {
-    Ok(format!("git@github.com:{}.git", repository_name))
+    Ok(format!("https://github.com/{}", repository_name))
 }
 
 pub fn clone_repository(ssh_path: &String) -> Result<String> {
@@ -23,12 +23,7 @@ pub fn clone_repository(ssh_path: &String) -> Result<String> {
         .unwrap()
         .wait()?;
 
-    let repository_path = {
-        let path_buf = fs::canonicalize(&cache)?;
-        path_buf.display().to_string()
-    };
-
-    Ok(repository_path)
+    Ok(cache)
 }
 
 pub fn get_head_commit_hash(repository_path: &String) -> Result<String> {
@@ -54,16 +49,29 @@ pub fn get_repository_data(
     branch_name: &String,
     workspace: &Option<String>,
 ) -> Result<EndpointSetting> {
-    let target_file = {
+    let endpoints_file = {
         match workspace {
-            Some(w) => format!("{}/{}/.endpoints.json", repository_path, w),
-            None => format!("{}/.endpoints.json", repository_path),
+            Some(w) => format!("./{}/.endpoints.json", w),
+            None => "./.endpoints.json".to_owned(),
         }
     };
-    Command::new("git")
-        .args(["checkout", branch_name, "--", &target_file])
+
+    let output = Command::new("git")
+        .args(["checkout", branch_name, "--", &endpoints_file])
         .current_dir(repository_path)
         .output()?;
+
+    if !output.status.success() {
+        println!("{:?}", output);
+        return Err(anyhow::anyhow!("Failed to checkout"));
+    }
+
+    let target_file = {
+        match workspace {
+            Some(w) => format!("./{}/{}/.endpoints.json", repository_path, w),
+            None => format!("./{}/.endpoints.json", repository_path),
+        }
+    };
 
     let mut contents = String::new();
     let mut file = File::open(target_file)?;

@@ -9,8 +9,8 @@ fn normalize_name(n: &str) -> &str {
 }
 
 fn normalize_url(u: &str) -> String {
-    if u.ends_with('/') {
-        u[..u.len() - 1].to_string()
+    if let Some(stripped) = u.strip_suffix('/') {
+        stripped.to_string()
     } else {
         u.to_string()
     }
@@ -22,9 +22,9 @@ pub fn make_root(environment_identifier: String, env: EnvList) -> String {
         .map(|(n, u)| {
             format!(
                 r#"
-      if {} == "{}" {{
+    if ({} == "{}") {{
         __root = '{}';
-      }}
+    }}
     "#,
                 environment_identifier,
                 normalize_name(n),
@@ -39,10 +39,10 @@ pub fn make_root(environment_identifier: String, env: EnvList) -> String {
 /**
  * A function that returns the URL part common to the endpoints.
  */
-pub fn root() -> String {{
-    let mut __root = String::new();
+export const root = () => {{
+    let __root = "";
     {}
-    __root
+    return __root
 }}
 "#,
         content

@@ -13,10 +13,11 @@ type EndpointName = String;
 
 type EndpointList = HashMap<EndpointName, Endpoint>;
 
+// $defsを利用しているプロジェクトがあるので仕方なくオプションにしている
 #[derive(Serialize, Deserialize)]
 pub struct EndpointAssets {
-    pub env: EnvList,
-    pub api: EndpointList,
+    pub env: Option<EnvList>,
+    pub api: Option<EndpointList>,
 }
 
 type EndpointVersion = String;

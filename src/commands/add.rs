@@ -20,13 +20,22 @@ pub fn run(repository_name: String, workspace: Option<String>) -> Result<()> {
     let repository_data = get_repository_data(&repository_path, &main_branch_name, &workspace)?;
 
     for (version, period) in repository_data {
+        if period.env.as_ref().map_or(true, |env| env.is_empty())
+            && period.api.as_ref().map_or(true, |api| api.is_empty())
+        {
+            continue;
+        }
+
         let mut names: Vec<String> = Vec::new();
         let mut fns: Vec<String> = Vec::new();
 
-        let root = make_root(config.environment_identifier.clone(), period.env);
+        let root = make_root(
+            config.environment_identifier.clone(),
+            period.env.unwrap_or_default(),
+        );
         fns.push(root);
 
-        for (_name, _endpoint) in period.api {
+        for (_name, _endpoint) in period.api.unwrap_or_default() {
             let name = to_camel_case(&_name.to_string());
             names.push(name.clone());
             fns.push(make_endpoint(name.clone(), _endpoint));
