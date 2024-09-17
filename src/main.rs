@@ -30,8 +30,6 @@ struct AddArgs {
     #[clap(short, long)]
     branch: Option<String>,
     #[clap(short, long)]
-    version: Option<String>,
-    #[clap(short, long)]
     excludes: Option<String>,
 }
 
@@ -42,7 +40,11 @@ fn main() -> Result<()> {
             commands::init::run()?;
         }
         Commands::Add(args) => {
-            commands::add::run(args.repository.clone(), args.workspace.clone())?;
+            commands::add::run(
+                args.repository.clone(),
+                args.workspace.clone(),
+                args.branch.clone(),
+            )?;
         }
         Commands::Install {} => todo!(),
         Commands::Update {} => todo!(),

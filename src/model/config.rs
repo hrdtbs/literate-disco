@@ -22,6 +22,7 @@ pub struct Service {
     pub version: String,
     pub repository: String,
     pub workspaces: Vec<String>,
+    pub branch: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -70,6 +71,7 @@ fn test_config_push() {
             version: "1.0.0".to_string(),
             repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
             workspaces: Vec::new(),
+            branch: None,
         },
     );
 
@@ -85,6 +87,7 @@ fn test_config_push() {
             version: "2.0.0".to_string(),
             repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
             workspaces: vec!["go".to_string()],
+            branch: None,
         },
     );
 

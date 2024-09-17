@@ -49,13 +49,17 @@ pub fn create_endpoint_files(
     output: String,
     environment_identifier: String,
     workspace: Option<String>,
+    branch: Option<String>,
 ) -> Result<Service> {
     let repository_alias = get_repository_alias(&repository_name)?;
     let ssh_path = get_repository_ssh_path(&repository_name)?;
     let repository_path = clone_repository(&ssh_path)?;
     let head_commit_hash = get_head_commit_hash(&repository_path)?;
-    let main_branch_name = detect_main_branch(&repository_path)?;
-    let repository_data = get_repository_data(&repository_path, &main_branch_name, &workspace)?;
+    let branch_name = match branch {
+        Some(branch) => branch,
+        None => detect_main_branch(&repository_path)?,
+    };
+    let repository_data = get_repository_data(&repository_path, &branch_name, &workspace)?;
 
     let mut index_imports: Vec<String> = Vec::new();
     let mut index_exports_names: Vec<String> = Vec::new();
@@ -127,5 +131,6 @@ pub fn create_endpoint_files(
             Some(workspace) => vec![workspace],
             None => vec![],
         },
+        branch: Some(branch_name.clone()),
     })
 }
