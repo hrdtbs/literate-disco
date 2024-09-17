@@ -3,7 +3,7 @@
 - [x] init
 - [x] add [username/repository]
 - [x] add [username/repository] -w [workspace_name]
-- [ ] add [username/repository] -b [branch name]
+- [x] add [username/repository] -b [branch name]
 - [ ] add [username/repository] -e [period name] [period name]
 - [ ] install
 - [ ] update [service_name]
