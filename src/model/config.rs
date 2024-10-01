@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub struct ConfigOption {
-    pub dependencies: HashMap<String, Service>,
-    pub environment_identifier: String,
     pub output: String,
+    pub environment_identifier: String,
+    pub dependencies: HashMap<String, Service>,
 }
 
 impl Default for ConfigOption {
@@ -23,18 +23,24 @@ pub struct Service {
     pub repository: String,
     pub workspaces: Vec<String>,
     pub branch: Option<String>,
+    pub exclude_periods: Option<Vec<String>>,
+    pub roots: Option<HashMap<String, String>>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
-    dependencies: HashMap<String, Service>,
-    pub environment_identifier: String,
+    #[serde(rename = "$schema")]
+    schema: String,
     pub output: String,
+    pub environment_identifier: String,
+    dependencies: HashMap<String, Service>,
+
 }
 
 impl Config {
     pub fn new(option: ConfigOption) -> Config {
         Config {
+            schema: "https://matsuri-tech.github.io/endpoints-sdk-cli/schema.json".to_string(),
             dependencies: option.dependencies,
             environment_identifier: option.environment_identifier,
             output: option.output,
