@@ -132,5 +132,7 @@ pub fn create_endpoint_files(
             None => vec![],
         },
         branch: Some(branch_name.clone()),
+        exclude_periods: None,
+        roots: None,
     })
 }
