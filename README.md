@@ -1,14 +1,16 @@
 # literate-disco
 
-- [x] init
-- [x] add [username/repository]
-- [x] add [username/repository] -w [workspace_name]
-- [x] add [username/repository] -b [branch name]
-- [ ] add [username/repository] -e [period name] [period name]
-- [ ] install
-- [ ] update [service_name]
-- [ ] `environment_identifier`
-- [ ] override root url
+- [x] `init`
+- [x] `add [username/repository]`
+- [x] `add [username/repository] -w [workspace_name]`
+- [x] `add [username/repository] -b [branch name]`
+- [ ] `add [username/repository] -e [period name] [period name]`
+- [ ] Overwrite root urls
+- [x] Overwrite output directory
+- [x] Add schema field
+- [x] Overwrite Environment identifier
+- [ ] `install`
+- [ ] `update [service_name]`
 
 
 ## not supported
