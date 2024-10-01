@@ -34,7 +34,6 @@ pub struct Config {
     pub output: String,
     pub environment_identifier: String,
     dependencies: HashMap<String, Service>,
-
 }
 
 impl Config {
