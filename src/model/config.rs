@@ -58,6 +58,7 @@ fn test_config_new() {
     });
 
     let expected = serde_json::to_string_pretty(&Config {
+        schema: "https://matsuri-tech.github.io/endpoints-sdk-cli/schema.json".to_string(),
         dependencies: HashMap::new(),
         environment_identifier: "process.env.NODE_ENV".to_string(),
         output: "./endpoints/".to_string(),
@@ -77,6 +78,8 @@ fn test_config_push() {
             repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
             workspaces: Vec::new(),
             branch: None,
+            exclude_periods: None,
+            roots: None,
         },
     );
 
@@ -93,6 +96,8 @@ fn test_config_push() {
             repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
             workspaces: vec!["go".to_string()],
             branch: None,
+            exclude_periods: None,
+            roots: None,
         },
     );
 
