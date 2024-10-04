@@ -7,6 +7,7 @@ pub fn run(
     repository_name: String,
     workspace: Option<String>,
     branch: Option<String>,
+    exclude_periods: Option<Vec<String>>,
 ) -> Result<()> {
     let mut config = read_config_file()?;
 
@@ -16,6 +17,7 @@ pub fn run(
         config.environment_identifier.clone(),
         workspace,
         branch,
+        exclude_periods,
     )?;
 
     config.push(get_repository_alias(&repository_name)?, service);

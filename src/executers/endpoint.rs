@@ -50,6 +50,7 @@ pub fn create_endpoint_files(
     environment_identifier: String,
     workspace: Option<String>,
     branch: Option<String>,
+    exclude_periods: Option<Vec<String>>,
 ) -> Result<Service> {
     let repository_alias = get_repository_alias(&repository_name)?;
     let ssh_path = get_repository_ssh_path(&repository_name)?;
@@ -65,6 +66,13 @@ pub fn create_endpoint_files(
     let mut index_exports_names: Vec<String> = Vec::new();
 
     for (version, period) in repository_data {
+        if exclude_periods
+            .as_ref()
+            .map_or(false, |excludes| excludes.contains(&version))
+        {
+            continue;
+        }
+
         if period.env.as_ref().map_or(true, |env| env.is_empty())
             && period.api.as_ref().map_or(true, |api| api.is_empty())
         {

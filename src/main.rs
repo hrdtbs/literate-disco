@@ -30,7 +30,7 @@ struct AddArgs {
     #[clap(short, long)]
     branch: Option<String>,
     #[clap(short, long)]
-    excludes: Option<String>,
+    excludes: Option<Vec<String>>,
 }
 
 fn main() -> Result<()> {
@@ -44,6 +44,7 @@ fn main() -> Result<()> {
                 args.repository.clone(),
                 args.workspace.clone(),
                 args.branch.clone(),
+                args.excludes.clone(),
             )?;
         }
         Commands::Install {} => todo!(),
