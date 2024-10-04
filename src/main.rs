@@ -47,7 +47,9 @@ fn main() -> Result<()> {
                 args.excludes.clone(),
             )?;
         }
-        Commands::Install {} => todo!(),
+        Commands::Install {} => {
+            commands::install::run()?;
+        }
         Commands::Update {} => todo!(),
     }
     Ok(())
