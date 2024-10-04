@@ -33,7 +33,7 @@ pub struct Config {
     schema: String,
     pub output: String,
     pub environment_identifier: String,
-    dependencies: HashMap<String, Service>,
+    pub dependencies: HashMap<String, Service>,
 }
 
 impl Config {

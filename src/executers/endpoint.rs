@@ -3,6 +3,7 @@ use crate::templates::root::make_root;
 use crate::utils::to_camel_case::to_camel_case;
 use crate::{executers::repository::*, model::config::Service};
 use anyhow::{Ok, Result};
+use std::collections::HashMap;
 use std::{fs::File, io::Write, path::Path};
 
 pub fn get_endpoint_filepath(
@@ -51,6 +52,7 @@ pub fn create_endpoint_files(
     workspace: Option<String>,
     branch: Option<String>,
     exclude_periods: Option<Vec<String>>,
+    roots: Option<HashMap<String, String>>,
 ) -> Result<Service> {
     let repository_alias = get_repository_alias(&repository_name)?;
     let ssh_path = get_repository_ssh_path(&repository_name)?;
@@ -85,6 +87,7 @@ pub fn create_endpoint_files(
         let root = make_root(
             environment_identifier.clone(),
             period.env.unwrap_or_default(),
+            roots.clone(),
         );
         fns.push(root);
 
