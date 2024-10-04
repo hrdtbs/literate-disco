@@ -23,4 +23,6 @@
 - add [username/repository] -v [commmit_hash]: Unused feature
 - authSchema: Unused feature
 - request & response type: Unused feature
+- `add [username/repository] -w [workspace_name] -w [workspace_name]`: Unused feature 
+
 
