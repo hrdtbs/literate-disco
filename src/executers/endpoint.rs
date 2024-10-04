@@ -138,12 +138,9 @@ pub fn create_endpoint_files(
     Ok(Service {
         version: head_commit_hash,
         repository: ssh_path,
-        workspaces: match workspace {
-            Some(workspace) => vec![workspace],
-            None => vec![],
-        },
+        workspaces: workspace.map(|workspace| vec![workspace]),
         branch: Some(branch_name.clone()),
-        exclude_periods: None,
-        roots: None,
+        exclude_periods,
+        roots,
     })
 }

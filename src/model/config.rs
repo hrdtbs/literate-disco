@@ -21,9 +21,13 @@ impl Default for ConfigOption {
 pub struct Service {
     pub version: String,
     pub repository: String,
-    pub workspaces: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workspaces: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub branch: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub exclude_periods: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub roots: Option<HashMap<String, String>>,
 }
 
@@ -76,7 +80,7 @@ fn test_config_push() {
         Service {
             version: "1.0.0".to_string(),
             repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
-            workspaces: Vec::new(),
+            workspaces: None,
             branch: None,
             exclude_periods: None,
             roots: None,
@@ -94,7 +98,7 @@ fn test_config_push() {
         Service {
             version: "2.0.0".to_string(),
             repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
-            workspaces: vec!["go".to_string()],
+            workspaces: Some(vec!["go".to_string()]),
             branch: None,
             exclude_periods: None,
             roots: None,
@@ -109,7 +113,10 @@ fn test_config_push() {
         "git@github.com:matsuri-tech/endpoints-sdk-cli.git"
     );
     assert_eq!(result.dependencies["mes"].version, "2.0.0");
-    assert_eq!(result.dependencies["mes"].workspaces, vec!["go"]);
+    assert_eq!(
+        result.dependencies["mes"].workspaces,
+        Some(vec!["go".to_string()])
+    );
     assert_eq!(result.output, "./src/endpoints/");
     assert_eq!(result.environment_identifier, "process.env.NEXT_ENV");
 }
