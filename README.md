@@ -12,7 +12,7 @@
 - [x] Install fixed version
 - [x] Support method field
 - [x] `install`
-- [ ] `update [service_name]`
+- [x] `update [service_name]`
 
 
 ## not supported

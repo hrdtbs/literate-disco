@@ -19,7 +19,7 @@ enum Commands {
     Init {},
     Add(AddArgs),
     Install {},
-    Update {},
+    Update(UpdateArgs),
 }
 
 #[derive(Args)]
@@ -31,6 +31,11 @@ struct AddArgs {
     branch: Option<String>,
     #[clap(short, long)]
     excludes: Option<Vec<String>>,
+}
+
+#[derive(Args)]
+struct UpdateArgs {
+    alias: String,
 }
 
 fn main() -> Result<()> {
@@ -50,7 +55,9 @@ fn main() -> Result<()> {
         Commands::Install {} => {
             commands::install::run()?;
         }
-        Commands::Update {} => todo!(),
+        Commands::Update(args) => {
+            commands::update::run(args.alias.clone())?;
+        }
     }
     Ok(())
 }
