@@ -155,7 +155,7 @@ pub fn make_endpoint(name: String, endpoint: Endpoint) -> String {
         }
         path_template
     };
-    let result = format!(
+    let mut result = format!(
         r#"
 /**
  * {description}
@@ -175,6 +175,13 @@ export const {name}=({{{parameters}}}:{{{parameter_types}}})=>{{
 }};
 "#
     );
+    if let Some(method) = endpoint.method {
+        result.push_str(&format!(
+            r#"
+{name}.method = "{method}" as const;
+"#
+        ));
+    }
     result
 }
 
@@ -209,6 +216,43 @@ export const health_check=({ee, hoge, id, date}:{ee?: string, hoge?: number, id?
     const __path = `${__root}/${id}/${date}/`;
     return __queries ? `${__path}?${__queries}` : __path;
 };
+"#
+    );
+}
+
+#[test]
+fn test_make_endpoint_with_method() {
+    let result = make_endpoint(
+        "health_check".to_string(),
+        Endpoint {
+            path: "/:id/:date/?ee&hoge=22&id=hoge".to_string(),
+            desc: "This is health check".to_string(),
+            method: Some("GET".to_string()),
+        },
+    );
+    assert_eq!(
+        result,
+        r#"
+/**
+ * This is health check
+ * @param {string} ee 
+ * @param {number} hoge 22
+ * @param {string} id hoge
+ */
+export const health_check=({ee, hoge, id, date}:{ee?: string, hoge?: number, id?: string, date: string})=>{
+    const __root = root();
+    const __queries = Object.entries({ee, hoge, id})
+        .filter(([_, value])=> {
+            return value !== undefined
+        })
+        .map(([key, value])=> {
+            return `${key}=${value}`
+        }).join("&");
+    const __path = `${__root}/${id}/${date}/`;
+    return __queries ? `${__path}?${__queries}` : __path;
+};
+
+health_check.method = "GET" as const;
 "#
     );
 }
