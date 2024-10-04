@@ -10,7 +10,7 @@ pub fn get_repository_alias(repository_name: &str) -> Result<String> {
     Ok(alias.to_string())
 }
 
-pub fn get_repository_ssh_path(repository_name: &String) -> Result<String> {
+pub fn get_repository_path(repository_name: &String) -> Result<String> {
     Ok(format!("https://github.com/{}", repository_name))
 }
 

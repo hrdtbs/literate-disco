@@ -84,14 +84,14 @@ pub fn create_endpoint_files(
     roots: Option<HashMap<String, String>>,
 ) -> Result<Service> {
     let repository_alias = get_repository_alias(&repository_name)?;
-    let ssh_path = get_repository_ssh_path(&repository_name)?;
-    let repository_path = clone_repository(&ssh_path)?;
-    let head_commit_hash = get_head_commit_hash(&repository_path)?;
+    let repository_path = get_repository_path(&repository_name)?;
+    let cloned_repository_path = clone_repository(&repository_path)?;
+    let head_commit_hash = get_head_commit_hash(&cloned_repository_path)?;
     let branch_name = match branch {
         Some(branch) => branch,
-        None => detect_main_branch(&repository_path)?,
+        None => detect_main_branch(&cloned_repository_path)?,
     };
-    let repository_data = get_repository_data(&repository_path, &branch_name, &workspace)?;
+    let repository_data = get_repository_data(&cloned_repository_path, &branch_name, &workspace)?;
 
     let mut index_imports: Vec<String> = Vec::new();
     let mut index_exports_names: Vec<String> = Vec::new();
@@ -177,7 +177,7 @@ pub fn create_endpoint_files(
 
     Ok(Service {
         version: head_commit_hash,
-        repository: ssh_path,
+        repository: repository_path,
         workspaces: workspace.map(|workspace| vec![workspace]),
         branch: Some(branch_name.clone()),
         exclude_periods,
