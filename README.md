@@ -5,7 +5,7 @@
 - [x] `add [username/repository] -w [workspace_name]`
 - [x] `add [username/repository] -b [branch name]`
 - [x] `add [username/repository] -e [period name] -e [period name]`
-- [ ] Overwrite root urls
+- [x] Overwrite root urls
 - [x] Overwrite output directory
 - [x] Add schema field
 - [x] Overwrite Environment identifier
