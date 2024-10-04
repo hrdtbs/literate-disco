@@ -20,7 +20,10 @@ pub fn run(
         workspace,
         branch,
         exclude_periods,
-        config.dependencies.get(&alias).unwrap().roots.clone(),
+        config
+            .dependencies
+            .get(&alias)
+            .and_then(|service| service.roots.clone()),
     )?;
 
     config.push(alias, service);
