@@ -19,4 +19,7 @@
 - add ./local-repository: Use branch flag instead
 - add git@github.com:[username/repository].git: Use auto-completion feature
 - add https://github.com/[username/repository].git: Use auto-completion feature
-- add [username/repository] -v [commmit_hash]: This is an unused feature
+- add [username/repository] -v [commmit_hash]: Unused feature
+- authSchema: Unused feature
+- request & response type: Unused feature
+
