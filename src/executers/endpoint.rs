@@ -1,4 +1,3 @@
-use crate::model::config::ServiceOption;
 use crate::templates::endpoint::make_endpoint;
 use crate::templates::root::make_root;
 use crate::utils::to_camel_case::to_camel_case;
@@ -78,10 +77,9 @@ pub fn write_endpoint_file(output: String, filename: String, contents: String) -
 
 pub fn create_endpoint_files(
     repository_alias: String,
-    service: ServiceOption,
+    service: Service,
     environment_identifier: String,
     output: String,
-    workspace: Option<String>,
 ) -> Result<Service> {
     let cloned_repository_path = clone_repository(&service.repository)?;
     let head_commit_hash = get_head_commit_hash(&cloned_repository_path)?;
@@ -89,6 +87,12 @@ pub fn create_endpoint_files(
         Some(branch) => branch,
         None => detect_main_branch(&cloned_repository_path)?,
     };
+    // workspacesは現状一つのケースしか対応していない
+    let workspace = service
+        .workspaces
+        .clone()
+        .map(|workspaces| workspaces[0].clone());
+
     let repository_data = get_repository_data(&cloned_repository_path, &branch_name, &workspace)?;
 
     let mut index_imports: Vec<String> = Vec::new();
@@ -175,7 +179,7 @@ pub fn create_endpoint_files(
     )?;
 
     Ok(Service {
-        version: head_commit_hash,
+        version: Some(head_commit_hash),
         repository: service.repository,
         workspaces: workspace.map(|workspace| vec![workspace]),
         branch: Some(branch_name.clone()),

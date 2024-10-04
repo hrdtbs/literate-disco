@@ -26,7 +26,7 @@ enum Commands {
 struct AddArgs {
     repository: String,
     #[clap(short, long)]
-    workspace: Option<String>,
+    workspaces: Option<Vec<String>>,
     #[clap(short, long)]
     branch: Option<String>,
     #[clap(short, long)]
@@ -42,7 +42,7 @@ fn main() -> Result<()> {
         Commands::Add(args) => {
             commands::add::run(
                 args.repository.clone(),
-                args.workspace.clone(),
+                args.workspaces.clone(),
                 args.branch.clone(),
                 args.excludes.clone(),
             )?;

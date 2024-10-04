@@ -17,16 +17,9 @@ impl Default for ConfigOption {
     }
 }
 
-pub struct ServiceOption {
-    pub repository: String,
-    pub branch: Option<String>,
-    pub exclude_periods: Option<Vec<String>>,
-    pub roots: Option<HashMap<String, String>>,
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct Service {
-    pub version: String,
+    pub version: Option<String>,
     pub repository: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workspaces: Option<Vec<String>>,
@@ -85,7 +78,7 @@ fn test_config_push() {
     deps.insert(
         "mes".to_string(),
         Service {
-            version: "1.0.0".to_string(),
+            version: Some("1.0.0".to_string()),
             repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
             workspaces: None,
             branch: None,
@@ -103,7 +96,7 @@ fn test_config_push() {
     config.push(
         "mes".to_string(),
         Service {
-            version: "2.0.0".to_string(),
+            version: Some("2.0.0".to_string()),
             repository: "git@github.com:matsuri-tech/endpoints-sdk-cli.git".to_string(),
             workspaces: Some(vec!["go".to_string()]),
             branch: None,
@@ -119,7 +112,10 @@ fn test_config_push() {
         result.dependencies["mes"].repository,
         "git@github.com:matsuri-tech/endpoints-sdk-cli.git"
     );
-    assert_eq!(result.dependencies["mes"].version, "2.0.0");
+    assert_eq!(
+        result.dependencies["mes"].version,
+        Some("2.0.0".to_string())
+    );
     assert_eq!(
         result.dependencies["mes"].workspaces,
         Some(vec!["go".to_string()])

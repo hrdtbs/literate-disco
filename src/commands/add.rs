@@ -1,12 +1,12 @@
 use crate::executers::config::*;
 use crate::executers::endpoint::*;
 use crate::executers::repository::*;
-use crate::model::config::ServiceOption;
+use crate::model::config::Service;
 use anyhow::{Ok, Result};
 
 pub fn run(
     repository_name: String,
-    workspace: Option<String>,
+    workspaces: Option<Vec<String>>,
     branch: Option<String>,
     exclude_periods: Option<Vec<String>>,
 ) -> Result<()> {
@@ -17,15 +17,16 @@ pub fn run(
 
     let service = create_endpoint_files(
         alias.clone(),
-        ServiceOption {
+        Service {
+            version: None,
             repository: repository_path,
+            workspaces,
             branch,
             exclude_periods,
             roots: None,
         },
         config.environment_identifier.clone(),
         config.output.clone(),
-        workspace,
     )?;
 
     config.push(alias, service);
