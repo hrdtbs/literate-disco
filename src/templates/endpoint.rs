@@ -188,7 +188,6 @@ fn test_make_endpoint() {
             method: None,
         },
     );
-    println!("{}", result);
     assert_eq!(
         result,
         r#"
