@@ -6,14 +6,6 @@ use crate::{executers::repository::*, model::config::Service};
 use anyhow::{Ok, Result};
 use std::{fs::File, io::Write, path::Path};
 
-/**
- * Return the endpoint file path
- * Patterns:
- * {repository_name}.{version}.ts
- * {repository_name}.{workspace}.{version}.ts
- * {repository_name}.{version}
- * {repository_name}.{workspace}.{version}
- */
 pub fn get_endpoint_filepath(
     repository_name: String,
     workspace: Option<String>,
@@ -40,7 +32,7 @@ pub fn get_endpoint_filepath(
 }
 
 #[test]
-fn test_get_filepath() {
+fn test_get_endpoint_filepath() {
     let filepath = get_endpoint_filepath(
         "repository".to_string(),
         Some("workspace".to_string()),
@@ -50,13 +42,23 @@ fn test_get_filepath() {
     .unwrap();
 
     assert_eq!(filepath, "repository.workspace.version.ts");
+}
 
-    let filepath =
-        get_endpoint_filepath("name".to_string(), None, Some("version".to_string()), true).unwrap();
+#[test]
+fn test_get_endpoint_filepath_without_workspace() {
+    let filepath = get_endpoint_filepath(
+        "repository".to_string(),
+        None,
+        Some("version".to_string()),
+        true,
+    )
+    .unwrap();
 
-    assert_eq!(filepath, "name.version.ts");
+    assert_eq!(filepath, "repository.version.ts");
+}
 
-    // no extension
+#[test]
+fn test_get_endpoint_filepath_without_extension() {
     let filepath =
         get_endpoint_filepath("name".to_string(), None, Some("version".to_string()), false)
             .unwrap();
