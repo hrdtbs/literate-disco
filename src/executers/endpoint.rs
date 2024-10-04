@@ -6,32 +6,61 @@ use anyhow::{Ok, Result};
 use std::collections::HashMap;
 use std::{fs::File, io::Write, path::Path};
 
+/**
+ * Return the endpoint file path
+ * Patterns:
+ * {repository_name}.{version}.ts
+ * {repository_name}.{workspace}.{version}.ts
+ * {repository_name}.{version}
+ * {repository_name}.{workspace}.{version}
+ */
 pub fn get_endpoint_filepath(
     repository_name: String,
     workspace: Option<String>,
-    version: String,
+    version: Option<String>,
+    has_extension: bool,
 ) -> Result<String> {
-    let base_name = match workspace {
-        Some(workspace) => [repository_name, workspace, version, "ts".to_string()].join("."),
-        None => [repository_name, version, "ts".to_string()].join("."),
-    };
+    let mut base_name = repository_name;
+
+    if let Some(workspace) = workspace {
+        base_name.push('.');
+        base_name.push_str(&workspace);
+    }
+
+    if let Some(version) = version {
+        base_name.push('.');
+        base_name.push_str(&version);
+    }
+
+    if has_extension {
+        base_name.push_str(".ts");
+    }
+
     Ok(base_name)
 }
 
 #[test]
 fn test_get_filepath() {
     let filepath = get_endpoint_filepath(
-        "test".to_string(),
-        Some("test".to_string()),
-        "test".to_string(),
+        "repository".to_string(),
+        Some("workspace".to_string()),
+        Some("version".to_string()),
+        true,
     )
     .unwrap();
 
-    assert_eq!(filepath, "test.test.test.ts");
+    assert_eq!(filepath, "repository.workspace.version.ts");
 
-    let filepath = get_endpoint_filepath("name".to_string(), None, "version".to_string()).unwrap();
+    let filepath =
+        get_endpoint_filepath("name".to_string(), None, Some("version".to_string()), true).unwrap();
 
     assert_eq!(filepath, "name.version.ts");
+
+    // no extension
+    let filepath =
+        get_endpoint_filepath("name".to_string(), None, Some("version".to_string()), false)
+            .unwrap();
+    assert_eq!(filepath, "name.version");
 }
 
 pub fn write_endpoint_file(output: String, filename: String, contents: String) -> Result<()> {
@@ -103,14 +132,22 @@ pub fn create_endpoint_files(
             names.join(",")
         );
 
-        let filepath =
-            get_endpoint_filepath(repository_alias.clone(), workspace.clone(), version.clone())?;
+        let filepath = get_endpoint_filepath(
+            repository_alias.clone(),
+            workspace.clone(),
+            Some(version.clone()),
+            true,
+        )?;
 
         index_imports.push(format!(
-            "import * as {} from './{}.{}';",
+            "import * as {} from './{}';",
             to_camel_case(&version.clone()),
-            &repository_alias,
-            version.clone()
+            get_endpoint_filepath(
+                repository_alias.clone(),
+                workspace.clone(),
+                Some(version.clone()),
+                true,
+            )?,
         ));
         index_exports_names.push(to_camel_case(&version.clone()));
 
