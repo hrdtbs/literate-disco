@@ -82,18 +82,25 @@ pub fn create_endpoint_files(
     output: String,
 ) -> Result<Service> {
     let cloned_repository_path = clone_repository(&service.repository)?;
-    let head_commit_hash = get_head_commit_hash(&cloned_repository_path)?;
+    let commit_hash = match service.version.clone() {
+        Some(version) => version,
+        None => get_head_commit_hash(&cloned_repository_path)?,
+    };
+
     let branch_name = match service.branch {
         Some(branch) => branch,
         None => detect_main_branch(&cloned_repository_path)?,
     };
-    // workspacesは現状一つのケースしか対応していない
-    let workspace = service
-        .workspaces
-        .clone()
-        .map(|workspaces| workspaces[0].clone());
 
-    let repository_data = get_repository_data(&cloned_repository_path, &branch_name, &workspace)?;
+    // workspaceが複数のケースに対応していない
+    let workspace = service.workspaces.as_ref().and_then(|w| w.first().cloned());
+
+    let repository_data = get_repository_data(
+        &cloned_repository_path,
+        &branch_name,
+        &workspace,
+        &service.version,
+    )?;
 
     let mut index_imports: Vec<String> = Vec::new();
     let mut index_exports_names: Vec<String> = Vec::new();
@@ -179,7 +186,7 @@ pub fn create_endpoint_files(
     )?;
 
     Ok(Service {
-        version: Some(head_commit_hash),
+        version: Some(commit_hash),
         repository: service.repository,
         workspaces: workspace.map(|workspace| vec![workspace]),
         branch: Some(branch_name.clone()),

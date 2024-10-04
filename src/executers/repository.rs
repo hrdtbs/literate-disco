@@ -48,6 +48,7 @@ pub fn get_repository_data(
     repository_path: &String,
     branch_name: &String,
     workspace: &Option<String>,
+    commit_hash: &Option<String>,
 ) -> Result<EndpointSetting> {
     let endpoints_file = {
         match workspace {
@@ -64,6 +65,21 @@ pub fn get_repository_data(
     if !output.status.success() {
         println!("{:?}", output);
         return Err(anyhow::anyhow!("Failed to checkout"));
+    }
+
+    match commit_hash {
+        Some(hash) => {
+            let output = Command::new("git")
+                .args(["reset", "--hard", hash])
+                .current_dir(repository_path)
+                .output()?;
+
+            if !output.status.success() {
+                println!("{:?}", output);
+                return Err(anyhow::anyhow!("Failed to git reset"));
+            }
+        }
+        None => {}
     }
 
     let target_file = {
