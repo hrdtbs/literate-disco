@@ -1,9 +1,9 @@
+use crate::model::config::ServiceOption;
 use crate::templates::endpoint::make_endpoint;
 use crate::templates::root::make_root;
 use crate::utils::to_camel_case::to_camel_case;
 use crate::{executers::repository::*, model::config::Service};
 use anyhow::{Ok, Result};
-use std::collections::HashMap;
 use std::{fs::File, io::Write, path::Path};
 
 /**
@@ -75,19 +75,15 @@ pub fn write_endpoint_file(output: String, filename: String, contents: String) -
 }
 
 pub fn create_endpoint_files(
-    repository_name: String,
-    output: String,
+    repository_alias: String,
+    service: ServiceOption,
     environment_identifier: String,
+    output: String,
     workspace: Option<String>,
-    branch: Option<String>,
-    exclude_periods: Option<Vec<String>>,
-    roots: Option<HashMap<String, String>>,
 ) -> Result<Service> {
-    let repository_alias = get_repository_alias(&repository_name)?;
-    let repository_path = get_repository_path(&repository_name)?;
-    let cloned_repository_path = clone_repository(&repository_path)?;
+    let cloned_repository_path = clone_repository(&service.repository)?;
     let head_commit_hash = get_head_commit_hash(&cloned_repository_path)?;
-    let branch_name = match branch {
+    let branch_name = match service.branch {
         Some(branch) => branch,
         None => detect_main_branch(&cloned_repository_path)?,
     };
@@ -97,7 +93,8 @@ pub fn create_endpoint_files(
     let mut index_exports_names: Vec<String> = Vec::new();
 
     for (version, period) in repository_data {
-        if exclude_periods
+        if service
+            .exclude_periods
             .as_ref()
             .map_or(false, |excludes| excludes.contains(&version))
         {
@@ -116,7 +113,7 @@ pub fn create_endpoint_files(
         let root = make_root(
             environment_identifier.clone(),
             period.env.unwrap_or_default(),
-            roots.clone(),
+            service.roots.clone(),
         );
         fns.push(root);
 
@@ -177,10 +174,10 @@ pub fn create_endpoint_files(
 
     Ok(Service {
         version: head_commit_hash,
-        repository: repository_path,
+        repository: service.repository,
         workspaces: workspace.map(|workspace| vec![workspace]),
         branch: Some(branch_name.clone()),
-        exclude_periods,
-        roots,
+        exclude_periods: service.exclude_periods,
+        roots: service.roots,
     })
 }

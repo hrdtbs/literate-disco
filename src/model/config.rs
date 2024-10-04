@@ -17,6 +17,13 @@ impl Default for ConfigOption {
     }
 }
 
+pub struct ServiceOption {
+    pub repository: String,
+    pub branch: Option<String>,
+    pub exclude_periods: Option<Vec<String>>,
+    pub roots: Option<HashMap<String, String>>,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct Service {
     pub version: String,

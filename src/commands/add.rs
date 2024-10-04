@@ -1,6 +1,7 @@
 use crate::executers::config::*;
 use crate::executers::endpoint::*;
 use crate::executers::repository::*;
+use crate::model::config::ServiceOption;
 use anyhow::{Ok, Result};
 
 pub fn run(
@@ -12,18 +13,19 @@ pub fn run(
     let mut config = read_config_file()?;
 
     let alias = get_repository_alias(&repository_name)?;
+    let repository_path = get_repository_path(&repository_name)?;
 
     let service = create_endpoint_files(
-        repository_name.clone(),
-        config.output.clone(),
+        alias.clone(),
+        ServiceOption {
+            repository: repository_path,
+            branch,
+            exclude_periods,
+            roots: None,
+        },
         config.environment_identifier.clone(),
+        config.output.clone(),
         workspace,
-        branch,
-        exclude_periods,
-        config
-            .dependencies
-            .get(&alias)
-            .and_then(|service| service.roots.clone()),
     )?;
 
     config.push(alias, service);
