@@ -158,9 +158,12 @@ pub fn create_endpoint_files(
         )?;
     }
 
+    index_imports.sort();
+    index_exports_names.sort();
+
     write_endpoint_file(
         output.clone(),
-        [repository_alias.clone(), "ts".to_string()].join("."),
+        get_endpoint_filepath(repository_alias.clone(), None, None, true)?,
         [
             index_imports.join("\n"),
             format!(
