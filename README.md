@@ -9,6 +9,7 @@
 - [x] Overwrite output directory
 - [x] Add schema field
 - [x] Overwrite Environment identifier
+- [x] Install fixed version
 - [ ] method field
 - [x] `install`
 - [ ] `update [service_name]`
