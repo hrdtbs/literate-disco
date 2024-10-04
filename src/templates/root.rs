@@ -1,4 +1,5 @@
 use crate::model::endpoint::EnvList;
+use std::collections::HashMap;
 
 fn normalize_name(n: &str) -> &str {
     match n {
@@ -17,6 +18,9 @@ fn normalize_url(u: &str) -> String {
 }
 
 pub fn make_root(environment_identifier: String, env: EnvList) -> String {
+    let mut env: Vec<(&String, &String)> = env.iter().collect();
+    env.sort_by(|(a, _), (b, _)| a.cmp(b));
+
     let content: String = env
         .iter()
         .map(|(n, u)| {
@@ -47,4 +51,36 @@ export const root = () => {{
 "#,
         content
     )
+}
+
+#[test]
+fn test_make_root() {
+    let result = make_root(
+        "process.env.NODE_ENV".to_string(),
+        HashMap::from([
+            ("dev".to_string(), "http://localhost:3000".to_string()),
+            ("prod".to_string(), "https://example.com".to_string()),
+        ]),
+    );
+    assert_eq!(
+        result,
+        r#"
+/**
+ * A function that returns the URL part common to the endpoints.
+ */
+export const root = () => {
+    let __root = "";
+    
+    if (process.env.NODE_ENV == "development") {
+        __root = 'http://localhost:3000';
+    }
+    
+    if (process.env.NODE_ENV == "production") {
+        __root = 'https://example.com';
+    }
+    
+    return __root
+}
+"#
+    );
 }
