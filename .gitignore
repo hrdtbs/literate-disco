@@ -195,3 +195,7 @@ Cargo.lock
 !.yarn/versions
 
 *.node
+
+endpoints.config.json
+node_modules/
+endpoints/
