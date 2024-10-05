@@ -3,6 +3,14 @@
   "version": "0.0.0",
   "main": "index.js",
   "types": "index.d.ts",
+  "bin": {
+    "mes": "bin.js"
+  },
+  "files": [
+    "bin.js",
+    "index.js",
+    "index.d.ts"
+  ],
   "napi": {
     "name": "literate-disco",
     "triples": {

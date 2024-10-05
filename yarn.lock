@@ -19,5 +19,7 @@ __metadata:
   resolution: "literate-disco@workspace:."
   dependencies:
     "@napi-rs/cli": "npm:^2.18.4"
+  bin:
+    mes: bin.js
   languageName: unknown
   linkType: soft
