@@ -1,4 +1,5 @@
-#![deny(clippy::all)]
+#[macro_use]
+extern crate napi_derive;
 
 mod commands;
 mod executers;
@@ -6,10 +7,6 @@ mod model;
 mod templates;
 mod utils;
 
-#[macro_use]
-extern crate napi_derive;
-
-use anyhow::{Ok as AnyOk, Result as AnyResult};
 use clap::{Args, Parser, Subcommand};
 use napi::{Error as NapiError, Result as NapiResult, Status as NapiStatus};
 
@@ -44,31 +41,28 @@ struct UpdateArgs {
   alias: String,
 }
 
-fn run() -> AnyResult<()> {
-  let cli = Cli::parse();
-  match &cli.command {
-    Commands::Init {} => {
-      commands::init::run()?;
-    }
-    Commands::Add(args) => {
-      commands::add::run(
-        args.repository.clone(),
-        args.workspaces.clone(),
-        args.branch.clone(),
-        args.excludes.clone(),
-      )?;
-    }
-    Commands::Install {} => {
-      commands::install::run()?;
-    }
-    Commands::Update(args) => {
-      commands::update::run(args.alias.clone())?;
-    }
-  }
-  AnyOk(())
-}
-
 #[napi]
-pub fn run_napi() -> NapiResult<()> {
-  run().map_err(|e| NapiError::new(NapiStatus::GenericFailure, format!("{:?}", e)))
+pub async fn run(args: Vec<String>) -> NapiResult<()> {
+  let cli = Cli::parse_from(args);
+
+  let result = match &cli.command {
+    Commands::Init {} => commands::init::run(),
+    Commands::Add(args) => commands::add::run(
+      args.repository.clone(),
+      args.workspaces.clone(),
+      args.branch.clone(),
+      args.excludes.clone(),
+    ),
+    Commands::Install {} => commands::install::run(),
+    Commands::Update(args) => commands::update::run(args.alias.clone()),
+  };
+
+  if let Err(e) = result {
+    return Err(NapiError::new(
+      NapiStatus::GenericFailure,
+      format!("Command failed: {}", e),
+    ));
+  }
+
+  Ok(())
 }
